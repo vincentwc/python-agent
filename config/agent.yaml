@@ -3,3 +3,7 @@ embeddings_model_name: "text-embedding-v4"
 
 external_data_path: data/external/records.csv
 
+mongo:
+  db_name: "smart_cleaner"
+  collection_name: "usage_records"
+

@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # MongoDB 数据库服务
+  mongodb:
+    image: mongo:latest
+    container_name: smart_agent_mongo
+    restart: always
+    ports:
+      - "27017:27017"  # 映射到宿主机，方便本地调试和脚本连接
+    volumes:
+      - mongodb_data:/data/db
+
+  # AI Agent 应用服务
+  app:
+    build: .
+    container_name: smart_agent_app
+    ports:
+      - "8501:8501"
+    environment:
+      # 在 Docker 网络内部，使用服务名 mongodb 作为主机名
+      - MONGO_URI=mongodb://mongodb:27017/
+      # 传递 API Key
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
+    depends_on:
+      - mongodb
+    volumes:
+      # 开发模式挂载，修改代码实时生效
+      - .:/app
+
+volumes:
+  mongodb_data:
