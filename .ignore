@@ -1,0 +1,24 @@
+# General
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# Environment variables
+.env
+
+# Virtual Environment
+venv/
+env/
+
+# Project Specific
+logs/
+chroma_db/
+chroma.sqlite3
+
+# External Data (if sensitive or large)
+data/external/
