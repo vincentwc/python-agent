@@ -3,7 +3,12 @@
 """
 
 import yaml
+from dotenv import load_dotenv
+
 from utils.path_tool import get_abs_path
+
+# 加载环境变量
+load_dotenv()
 
 
 def load_rag_config(

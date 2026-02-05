@@ -1,15 +1,15 @@
-import re
-
 """
 RAG服务[总结服务类]:用户提问，搜索参看资料，将提问和参考资料提交给模型，模型返回总结结果
 """
 
+from utils.logger_handler import logger
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+
+from model.factory import chat_model
 from rag.vector_store import VectoreStoreService
 from utils.prompt_loader import load_rag_prompts
-from langchain_core.prompts import PromptTemplate
-from model.factory import chat_model
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.documents import Document
 
 
 def print_promot(prompt: str):
@@ -18,9 +18,9 @@ def print_promot(prompt: str):
     :param prompt: 提示词字符串
     :return: prompt
     """
-    print("=" * 20)
-    print(prompt.to_string())
-    print("=" * 20)
+    logger.info("=" * 20)
+    logger.info(prompt.to_string())
+    logger.info("=" * 20)
     return prompt
 
 
@@ -54,19 +54,26 @@ class RagSummarizeService(object):
         :param query: 查询字符串
         :return: 总结结果字符串
         """
-        dcontext_docs = self.retriever_docs(query)
+        try:
+            dcontext_docs = self.retriever_docs(query)
 
-        context = ""
-        counter = 0
-        for doc in dcontext_docs:
-            counter += 1
-            context += f"[参考资料{counter}]:参考资料:{doc.page_content}|参考元数据:{doc.metadata}\n"
-        return self.chain.invoke(
-            {
-                "input": query,
-                "context": context,
-            }
-        )
+            context = ""
+            counter = 0
+            for doc in dcontext_docs:
+                counter += 1
+                context += f"[参考资料{counter}]:参考资料:{doc.page_content}|参考元数据:{doc.metadata}\n"
+
+            logger.info(f"[rag_summarize]检索到{counter}条参考资料")
+
+            return self.chain.invoke(
+                {
+                    "input": query,
+                    "context": context,
+                }
+            )
+        except Exception as e:
+            logger.error(f"[rag_summarize]执行失败: {str(e)}", exc_info=True)
+            return "抱歉，知识库总结服务暂时不可用。"
 
 
 if __name__ == "__main__":
